@@ -1,0 +1,55 @@
+name: Nutrição inicial (após material rico)
+goal: Aumentar engajamento e maturidade, elevando score até MQL sem repetir a entrega da LP
+
+entry_criteria:
+  # HÍBRIDO: comportamento crítico + score
+  - asset_downloaded = true               # baixou material rico (LP já fez a entrega)
+  - consent_email = true
+  - ((lead_score BETWEEN 20 AND 49) OR pageviews_7d >= 2)
+  - NOT has_event("demo_requested")
+
+topic_personalization:
+  source_field: last_asset_topic          # ex.: "tendências", "guia técnico", "ROI"
+  branches:
+    - if topic = "tendências": theme_path = "insights_setor"
+    - if topic = "guia técnico": theme_path = "implementacao_valor"
+    - else: theme_path = "geral"
+
+suppression_rules:
+  - lifecycle_stage IN ["customer","opportunity"]
+  - last_nurture_entered < 14d
+
+exit_criteria:
+  - lead_score >= mql_threshold
+  - OR has_event("demo_requested")
+  - OR no_engagement > 21d
+
+cadence:
+  - day 3:
+      channel: email
+      subject: "[{topic}] Checklist prático para aplicar em 15 minutos"
+      cta: "Baixar checklist"
+      effect: +5 score_on_download
+  - day 7:
+      channel: email
+      subject: "Benchmark do seu segmento em {topic}"
+      cta: "Ver benchmark"
+      effect: +8 score_on_click
+  - day 14:
+      channel: email
+      subject: "Sessão ao vivo: {topic} na prática"
+      cta: "Inscrever-se no webinar"
+      effect: +10 score_on_signup
+  - day 21:
+      channel: email
+      subject: "Comparativo: caminhos para resolver {dor} (inclui ROI)"
+      cta: "Abrir comparativo"
+      effect: +7 score_on_click
+
+tracking:
+  events_required: [asset_downloaded, webinar_signup, asset_click]
+kpis: [score_gain, mql_rate, content_ctr]
+
+compliance:
+  - add_opt_out_in_all_emails
+  - store_preferences_by_topic
