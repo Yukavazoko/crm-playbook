@@ -1,0 +1,46 @@
+name: Reciclagem de MQLs
+goal: Reengajar leads que já foram MQL e perderam timing/orçamento; reduzir CAC efetivo
+
+entry_criteria:
+  - last_stage = "mql"
+  - (lost_reason IN ["timing","sem_orcamento"] OR days_since_mql >= 30)
+  - consent_email = true
+  - no_recent_sdr_contact >= 14d
+
+suppression_rules:
+  - lifecycle_stage IN ["customer","opportunity"]
+  - has_event("demo_requested")
+
+exit_criteria:
+  - reconverted_to_mql = true
+  - OR moved_to("flows/conversao_quase_mql")
+  - OR no_engagement > 30d
+  - OR opt_out = true
+
+cadence:
+  - day 0:
+      channel: email
+      subject: "Podemos retomar? Novidades que podem mudar o cenário"
+      cta: "Ver novidades/roadmap"
+      effect: +8 score_on_click
+  - day 10:
+      channel: email
+      subject: "Atualização de produto: {feature_nova} que resolve {dor}"
+      cta: "Entender a atualização"
+      effect: +10 score_on_click
+  - day 25:
+      channel: email
+      subject: "Convite exclusivo: {evento_webinar} para {segmento}"
+      cta: "Inscrever-se"
+      effect: +12 score_on_signup
+  - day 27:
+      channel: task_SDR
+      action: "Follow-up humano para leads engajados (clique/inscrição)"
+
+tracking:
+  events_required: [email_click, product_update_viewed, event_signup]
+kpis: [reengagement_rate, reconverted_mql_rate, sql_rate_post_recycle, cac_effective_delta]
+
+compliance:
+  - add_opt_out_in_all_emails
+  - respect_suppression_reasons
