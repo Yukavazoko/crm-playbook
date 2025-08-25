@@ -76,6 +76,7 @@ Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativ
 ---
 
 ## Fluxos (réguas)
+- **Follow-up inbound (pós-formulário)** → [`flows/follow-up_inbound_pos_formulario.yaml`](flows/followup_inbound.yaml)  
 - **Nutrição inicial (B2B)** → [`flows/nutricao_inicial.yaml`](flows/nutricao_inicial.yaml)  
 - **Reciclagem (MQLs)** → [`flows/reciclagem_mqls.yaml`](flows/reciclagem_mqls.yaml)  
 - **Conversão (quase MQL)** →  [`flows/conversao_quase_mql.yaml`](flows/conversao_quase_mql.yaml)  
