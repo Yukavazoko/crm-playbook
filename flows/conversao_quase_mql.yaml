@@ -1,0 +1,56 @@
+name: Conversão - Quase MQL
+goal: Elevar leads engajados ao status de MQL via diagnóstico (enriquecimento) + CTAs de fundo de funil
+
+entry_criteria:
+  # HÍBRIDO: score OU comportamento crítico
+  - consent_email = true
+  - (
+      (lead_score BETWEEN 40 AND 59)
+      OR (visited_pages_7d CONTAINS "/pricing")
+      OR (visited_pages_7d CONTAINS "/produto")
+      OR (visited_pages_7d CONTAINS "/compare")
+    )
+  - NOT has_event("demo_requested")
+  - stage != "mql"
+
+suppression_rules:
+  - lifecycle_stage IN ["customer","opportunity"]
+  - last_conversion_flow < 10d
+
+exit_criteria:
+  - lead_score >= mql_threshold
+  - OR has_event("demo_requested")
+  - OR no_engagement > 7d
+
+cadence:
+  - day 0:
+      channel: email
+      subject: "Diagnóstico rápido: 3 perguntas para personalizar sua jornada"
+      cta: "Responder diagnóstico (1 min)"
+      form_fields: [team_size, main_challenge, current_tool]
+      effect: +10 score_on_form
+  - day 2:
+      channel: email
+      subject: "[Case do seu segmento] Como reduzir {dor} em X%"
+      cta_primary: "Solicitar demonstração personalizada"
+      cta_secondary: "Ver case completo"
+      effect: +15 score_on_demo_request
+  - day 5:
+      channel: email
+      subject: "Comparativo/ROI: qual caminho faz mais sentido para você?"
+      cta: "Abrir comparativo/ROI calculator"
+      effect: +5 score_on_click
+
+personalization:
+  segment_by: [industry, role]
+  dynamic_tokens: [company_name, pain_keyword]
+  behavioral_triggers:
+    - if visits("/pricing") >= 2 in 7d: send_variant = "ROI_first"
+
+tracking:
+  events_required: [form_submitted, demo_requested, asset_click]
+kpis: [mql_conversion_rate, demo_request_rate, sql_acceptance_rate, time_to_mql]
+
+compliance:
+  - add_opt_out_in_all_emails
+  - store_consent_log
