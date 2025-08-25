@@ -14,6 +14,13 @@
         "source": { "type": "string" },
         "campaign": { "type": "string" },
         "feature": { "type": "string" },
+        "plan_type": { "type": "string" },
+        "integration_type": { "type": "string" },
+        "contract_value": { "type": "number" },
+        "renewal_date": { "type": "string", "format": "date" },
+        "old_plan": { "type": "string" },
+        "new_plan": { "type": "string" },
+        "upsell_val": { "type": "number" },
         "consent": { "type": "boolean" }
       },
       "additionalProperties": true
