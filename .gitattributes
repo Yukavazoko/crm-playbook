@@ -1,2 +1,11 @@
+# Não contar arquivos de documentação como linguagens
 *.md linguist-documentation
+
+# Ignorar assets/imagens
 assets/** linguist-vendored
+
+# Ignorar YAML de flows (são configs, não código)
+flows/*.yaml linguist-vendored
+
+# Contar SQL normalmente (importante para aparecer no Top Languages)
+*.sql linguist-detectable=true
