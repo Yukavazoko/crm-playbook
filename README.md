@@ -50,11 +50,11 @@ Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativ
 ## Como Navegar
 - Comece pelos **princípios por etapa** em [`/strategies`](strategies/README.md).  
 - Aplique uma régua inicial em [`/flows`](/flows/README.md).  
-- Teste segmentações em [`/sql`](sql/propensao_churn.sql).  
-- Garanta tracking com [`/events_schema`](events_schema/tracking_events.json).  
-- Valide KPIs em [`/dashboards`](dashboards/crm_funnel_kpis.md).  
+- Teste segmentações em [`/sql`](sql/README.md).  
+- Garanta tracking com [`/events_schema`](events_schema/README.md).  
+- Valide KPIs em [`/dashboards`](dashboards/README.md).  
 - Consulte conformidade em [`/compliance`](compliance/lgpd_checklist.md).  
-- Veja resultados e aprendizados em [`/cases`](cases/case_01_onboarding_b2b.md).  
+- Veja resultados e aprendizados em [`/cases`](cases/README.md).  
 
 ---
 
