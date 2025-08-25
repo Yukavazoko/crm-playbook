@@ -70,8 +70,8 @@ Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativ
 
 ## Métricas & Dados
 - **Funil**: Leads → MQL → SQL → Closed Won → Ativado.  
-- **KPIs por etapa** e definições: veja [`/dashboards/crm_funnel_kpis.md`](dashboards/crm_funnel_kpis.md).  
-- **Contrato de dados** (eventos & propriedades): [`/events_schema`](events_schema/tracking_events.json).  
+- **KPIs por etapa** e definições: veja [`/dashboards/crm_funnel_kpis.md`](dashboards/README.md).  
+- **Contrato de dados** (eventos & propriedades): [`/events_schema`](events_schema/README.md).  
 
 ---
 
@@ -85,8 +85,8 @@ Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativ
 
 ## SQL (segmentações & risco)
 - **Propensão a churn (queda de uso)** → [`sql/propensao_churn.sql`](sql/propensao_churn.sql)  
-- **LTV por conta (exemplo)** → (em breve)  
-- **Lead scoring básico (exemplo)** → (em breve)  
+- **LTV por conta (exemplo)** → [`sql/ltv_por_conta.sql`](sql/ltv_por_conta.sql)  
+- **Lead scoring básico (exemplo)** → [`sql/lead_scoring_basico.sql`](sql/lead_scoring_basico.sql)  
 
 ---
 
@@ -109,8 +109,8 @@ Checklist de práticas essenciais (consentimento, opt-out, retenção, minimiza�
 ---
 
 ## Cases (anonimizados)
-- **Case 01 — Onboarding reduziu TTV** → [`cases/case_01_onboarding_b2b.md`](cases/case_01_onboarding_b2b.md)  
-- Case 02 — Reengajamento MQL → (em breve)  
+- **Case 01 — Conversão (quase MQL)** → [`cases/case_01_conversao_quase_mql.md`](cases/case_01_conversao_quase_mql.md)  
+- **Case 02 — Reciclagem de MQLs** → [`cases/case_02_reciclagem_mql.md`](cases/case_02_reciclagem_mql.md)    
 
 ---
 
