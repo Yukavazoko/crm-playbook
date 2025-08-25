@@ -33,14 +33,14 @@ Aqui você encontra **visão macro**, **réguas (YAML)**, **segmentações (SQL)
 ---
 
 ## Visão Macro da Jornada
-Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativação (Onboarding) → Engajamento → Retenção → Expansão** com loops de **recuperação** ao longo do caminho.
+Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativação (Onboarding) →  Retenção → Engajamento → Expansão** com loops de **recuperação** ao longo do caminho.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Yukavazoko/assets-diagramas/main/Fluxogramas.png" alt="Fluxograma CRM B2B" width="90%" />
 </p>
 
 <p align="center">
-  <i>Figura 1 — Jornada de CRM B2B com fluxos de aquisição, pré-venda, ativação, engajamento, retenção, expansão e estratégias de recuperação.</i>
+  <i>Figura 1 — Jornada de CRM B2B com fluxos de aquisição, pré-venda, ativação, retenção, engajamento, expansão e estratégias de recuperação.</i>
 </p>
 
 > **Dica**: MQL reciclado/recuperado pode voltar para SDR com régua específica. SQL perdido por timing volta para nutrição segmentada.
