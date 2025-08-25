@@ -1,0 +1,52 @@
+name: Follow-up Inbound (pós-formulário)
+goal: Validar intenção rapidamente e direcionar lead para Conversão ou Nutrição
+
+entry_criteria:
+  # HÍBRIDO: comportamento + (opcional) score
+  - form_submitted = true                 # converteu em LP, contato, webinar etc.
+  - consent_email = true
+  - (lead_score >= 30) OR true            # opcional: se usar score; senão ignore
+
+suppression_rules:
+  - has_event("demo_requested")           # já pediu demo: não entra
+  - lifecycle_stage IN ["customer","opportunity"]  # já avançado no funil
+  - last_followup_inbound < 7d            # evita repetição
+
+exit_criteria:
+  - has_event("demo_requested")           # vai direto para SDR/SQL
+  - OR moved_to("flows/nutricao_inicial") # sem resposta → nutrição
+  - OR no_engagement > 7d                 # não interagiu: encerra
+  - OR lead_score >= mql_threshold        # se atingir MQL, handoff
+
+cadence:
+  - day 0:
+      channel: email
+      subject: "Você conseguiu acessar o material?"
+      body: "Aqui está novamente o link + 1 vídeo curto complementar"
+      cta: "Assistir vídeo (2min)"
+      effect: +5 score (clique)
+  - day 2:
+      channel: email
+      subject: "[Case do seu segmento] Como reduzir [dor] em X%"
+      cta: "Quero ver como se aplica ao meu caso"
+      effect: +10 score (clique)
+  - day 4:
+      channel: email
+      subject: "Seguimos agora ou prefere ficar no radar?"
+      cta_primary: "Solicitar conversa rápida"
+      cta_secondary: "Continuar recebendo conteúdos"
+      branch:
+        - if click cta_primary: route_to = "flows/conversao_quase_mql" OR SDR
+        - else: route_to = "flows/nutricao_inicial"
+
+personalization:
+  segment_by: [industry, role, funnel_source]
+  dynamic_tokens: [company_name, pain_keyword, asset_title]
+
+tracking:
+  events_required: [form_submitted, email_click, demo_requested]
+  kpis: [reply_rate, demo_request_rate, routed_to_conversion, routed_to_nurture]
+
+compliance:
+  - opt_out_em_todos_os_emails
+  - registrar_consentimento
