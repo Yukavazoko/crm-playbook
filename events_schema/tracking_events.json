@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Contrato de Eventos - CRM B2B SaaS",
+  "type": "object",
+  "properties": {
+    "event_name": { "type": "string" },
+    "event_time": { "type": "string", "format": "date-time" },
+    "user_id": { "type": "string" },
+    "account_id": { "type": "string" },
+    "properties": {
+      "type": "object",
+      "properties": {
+        "channel": { "type": "string" },
+        "source": { "type": "string" },
+        "campaign": { "type": "string" },
+        "feature": { "type": "string" },
+        "consent": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["event_name", "event_time", "user_id", "account_id"]
+}
