@@ -1,6 +1,6 @@
 # SQL (Segmentações & Risco)
 
-Consultas SQL para **segmentações, propensão a churn, LTV e scoring**.
+Consultas SQL para **propensão a churn, LTV e scoring**.  
 Compatível com **BigQuery/Postgres** (ajuste funções conforme seu stack).
 
 ---
@@ -8,96 +8,73 @@ Compatível com **BigQuery/Postgres** (ajuste funções conforme seu stack).
 ## 📌 Propensão a Churn (queda de uso)
 
 **Problema**  
-Em B2B SaaS, churn raramente é “instantâneo”. Ele começa com sinais comportamentais: queda em logins, abandono de features críticas, menor frequência de uso. Se CRM/CS não captura isso cedo, perde a janela de atuação proativa.
+Em B2B SaaS, churn raramente é instantâneo. Ele começa com sinais comportamentais: queda em logins, abandono de features críticas, menor frequência de uso. Se CRM/CS não captura isso cedo, perde a janela de atuação proativa.
 
 **Solução (SQL)**  
 Comparar o uso de uma **feature-chave** nas **últimas 4 semanas** com as **4 semanas anteriores**.  
-- Considera “risco” quem tinha **uso consistente** na janela anterior (ex.: ≥10 eventos) e sofreu **queda ≥30%**.  
+- Considera “risco” quem tinha **uso consistente** (≥10 eventos) e sofreu **queda ≥30%**.  
 - Saída gera uma lista acionável para **régua de retenção** e playbook do CSM.
 
 **Blueprint** → [`propensao_churn.sql`](propensao_churn.sql)
 
-**Como interpretar**  
-- `uso_prev_4w` = base de comparação (estava usando).  
-- `uso_4w` = situação atual.  
-- `delta` = (uso_4w − uso_prev_4w) / uso_prev_4w  
-  - Ex.: 50 → 30 = **-40%** (risco); 20 → 18 = **-10%** (variação normal).
-
 **KPIs**  
-- **% contas sinalizadas** (queda ≥30%)  
-- **Taxa de recuperação** (contas que retomam uso após ação)  
-- **Impacto em GRR/NRR** (retenção bruta e líquida de receita)
+- % contas em risco  
+- Taxa de recuperação (contas que retomam uso após ação)  
+- Impacto em **GRR/NRR**  
 
-**GRR/NRR — resumo executivo**  
-- **GRR (Gross Revenue Retention)**: receita retida **sem** contar upsell.  
-  - Ex.: início R$100k; churn R$10k → **GRR 90%**.  
-- **NRR (Net Revenue Retention)**: receita retida **+ expansão** (upsell/cross-sell).  
-  - Ex.: início R$100k; churn R$10k; upsell R$15k → **NRR 105%**.  
-- Leituras: **GRR < 90%** alerta; **NRR > 100%** indica crescimento dentro da base.
-
-**Implementação — HubSpot**  
-- **Eventos de Produto (Custom Behavioral Events)**: enviar `feature_key_used` com `account_id`.  
-- **Listas dinâmicas/Relatórios**: comparar janelas (mês vs mês anterior).  
-- **Workflow**: se queda ≥30% →  
-  - Notificar CSM, abrir tarefa;  
-  - Entrar em **régua de retenção** (email/WhatsApp);  
-  - Se recuperar (uso volta), **retirar da lista**.
-
-**Implementação — RD Station**  
-- **Coleta de sinais**:  
-  - Via **RD Tracker** (para páginas críticas do app) **ou** integração API para eventos.  
-- **Segmentação**: importar/atualizar lista de contas em risco (API/CSV).  
-- **Automação**: acionar régua de retenção; marcar tag `risco_churn`; notificar CS via CRM.
-
-**Exemplo de saída (esperado)**
-| account_id | uso_prev_4w | uso_4w | delta  |
-|------------|-------------|--------|--------|
-| A123       | 50          | 30     | -0.40  |
-| B456       | 22          | 14     | -0.36  |
+**Ferramentas**  
+- **HubSpot**: enviar eventos de produto (Custom Behavioral Events), criar lista dinâmica de contas em risco e workflow para notificar CSM + ativar régua de retenção.  
+- **RD Station**: importar lista via API/CSV ou RD Tracker, marcar tag `risco_churn`, disparar régua de retenção, notificar CS no CRM.  
 
 ---
 
-## 📌 LTV por Conta (estimativa) — *em breve*
+## 📌 LTV por Conta (estimativa)
 
 **Problema**  
-Planejamento de CAC e priorização de CS exigem estimar **valor de vida (LTV)** por conta. Sem isso, investimentos e esforços ficam desbalanceados.
+Sem estimativa de LTV (Lifetime Value) por conta ou segmento, não é possível:  
+- dimensionar CAC viável,  
+- priorizar contas de alto valor no CS,  
+- nem planejar expansão de forma sustentável.
 
 **Solução (SQL)**  
-- Estimar **receita média por período** × **horizonte de retenção** (coorte/curva de sobrevivência) por segmento/plan.  
-- Ajustar por **descontos** e **probabilidade de churn** (ex.: oriunda da query de risco).
+Modelo simples e ajustável:  
+- `ARR_atual`: receita recorrente anual da conta.  
+- `horizonte_retencao`: meses médios de retenção por plano/segmento (coorte histórica).  
+- `ajuste`: fator de risco vindo da query de churn (reduz expectativa de retenção se a conta sinaliza risco).  
 
-**Entregáveis (planejado)**  
-- `ltv_por_conta.sql` (base)  
-- Tabelas auxiliares: receitapro mês, status de assinatura, coortes.
+**Blueprint** → [`ltv_por_conta.sql`](ltv_por_conta.sql)
 
 **KPIs**  
-- LTV médio por segmento/plan; LTV/CAC; payback.
+- **LTV médio** por plano/segmento  
+- **LTV/CAC** (saudável ≥ 3x)  
+- **Payback** (meses para recuperar CAC; saudável ≤ 12m em B2B mid-market)  
+- **NRR por faixa de LTV** (contas de maior LTV expandem mais?)  
+
+**Ferramentas**  
+- **HubSpot**: armazenar ARR, plano, risco em Company Properties; importar LTV estimado via API e usar em listas/reports; workflow de expansão/retention por faixas de LTV.  
+- **RD Station**: subir ARR/LTV como campos customizados; segmentar contas de alto LTV para campanhas de upsell; alto LTV + alto risco → acionar CS.  
 
 ---
 
-## 📌 Lead Scoring Básico (perfil + engajamento) — *em breve*
+## 📌 Lead Scoring Básico (perfil + engajamento)
 
 **Problema**  
-Sem um scoring objetivo, o funil mistura curiosos com ICP real, reduz a eficiência de SDR e alonga ciclo.
+Sem scoring objetivo, SDR recebe volume, não prioridade → mistura curiosos com ICP real, gera no-show e alonga ciclo.
 
 **Solução (SQL)**  
-- **Perfil (fit)**: porte da empresa, setor, região, cargo (peso maior).  
-- **Engajamento**: visitas a páginas críticas (preços/produto), downloads, webinars, replies.  
-- **Modelo híbrido**: score base + **boosts por eventos críticos** (ex.: visitar `/pricing` 2x em 7d).
+Modelo híbrido:  
+- **Perfil (fit)**: setor, porte, cargo, região (peso maior, ~60%).  
+- **Engajamento**: visitas a páginas críticas (preços/produto), downloads, replies (peso menor, ~40%).  
+- **Boosts**: atalhos para sinais fortes (visitou `/pricing` ≥2x/7d, pediu demo → score = 100).  
 
-**Entregáveis (planejado)**  
-- `lead_scoring_basico.sql` (parâmetros comentados)  
-- Guia de **calibração** por ICP e por estágio de jornada.
+**Blueprint** → [`lead_scoring_basico.sql`](lead_scoring_basico.sql)
 
 **KPIs**  
-- Conversão **quase MQL → MQL**, **MQL → SQL**, tempo até MQL, qualidade percebida por SDR.
+- Conversão Quase MQL → MQL  
+- Conversão MQL → SQL + taxa de no-show  
+- Tempo médio até MQL  
+- Qualidade percebida pelo SDR/CSM  
 
----
-
-## Observações Gerais
-
-- Ajuste nomes de tabelas/colunas conforme seu **data warehouse** (ex.: `analytics.events`, `billing.invoices`).  
-- Para Postgres, substitua funções específicas do BigQuery (`COUNTIF`, `SAFE_DIVIDE`) por equivalentes:  
-  - `COUNT(*) FILTER (WHERE ...)`  
-  - `CASE WHEN x=0 THEN NULL ELSE a::numeric/b END`
-- Integre a saída das queries ao **CRM** (lista dinâmica, tarefa CSM, automações de retenção/conversão).
+**Ferramentas**  
+- **HubSpot**: Lead Scoring nativo (perfil + eventos); boosts por page views; listas dinâmicas “Quase MQL” e “MQL”; workflows de roteamento.  
+- **RD Station**: Lead Scoring nativo (fit vs interesse); tracker para páginas críticas; automações: “quase MQL” → régua de Conversão; “MQL” → SDR.  
