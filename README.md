@@ -76,9 +76,9 @@ Diagrama de alto nível ligando **Aquisição → Pré-vendas (SDR/BDR) → Ativ
 ---
 
 ## Fluxos (réguas)
-- **Onboarding 30 dias (B2B)** → [`flows/ativacao_onboarding.yaml`](flows/ativacao_onboarding.yaml)  
-- **Reengajamento MQL reciclado** → [`flows/reengajamento_mql.yaml`](flows/reengajamento_mql.yaml)  
-- **Prevenção de churn (exemplo)** → (em breve)  
+- **Nutrição inicial (B2B)** → [`flows/nutricao_inicial.yaml`](flows/nutricao_inicial.yaml)  
+- **Reciclagem (MQLs)** → [`flows/reciclagem_mqls.yaml`](flows/reciclagem_mqls.yaml)  
+- **Conversão (quase MQL)** →  [`flows/conversao_quase_mql.yaml`](flows/conversao_quase_mql.yaml)  
 
 ---
 
